@@ -12,9 +12,9 @@
             [(ngModel)]="selectedUrl"
             (ngModelChange)="onSelectChange($event)"
           >
-            @for (item of list; track item.tag) {
+            <!-- @for (item of list; track item.tag) {
             <option value="{{ item.url }}">{{ item.tag }}</option>
-            }
+            } -->
           </select>
         </div>
         <input
