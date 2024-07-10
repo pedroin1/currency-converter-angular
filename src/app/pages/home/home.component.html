@@ -1,0 +1,59 @@
+<main class="h-screen flex bg-yellow-100/50 items-center justify-center">
+  <main-content>
+    <div>
+      <p class="mb-2 font-semibold text-gray-500">Moeda</p>
+      <div class="flex gap-4 items-center">
+        <div class="flex gap-2">
+          <img [src]="selectedUrl" alt="" width="50" class="rounded-[50%]" />
+          <select
+            name=""
+            id=""
+            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            [(ngModel)]="selectedUrl"
+            (ngModelChange)="onSelectChange($event)"
+          >
+            @for (item of list; track item.tag) {
+            <option value="{{ item.url }}">{{ item.tag }}</option>
+            }
+          </select>
+        </div>
+        <input
+          type="number"
+          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
+          placeholder="0.00"
+        />
+      </div>
+    </div>
+    <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+    <div>
+      <p class="mb-2 font-semibold text-gray-500">Convesao</p>
+      <div class="flex gap-4 items-center">
+        <div class="flex gap-2">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg"
+            alt=""
+            width="50"
+            class="rounded-[50%]"
+          />
+          <select
+            name=""
+            id=""
+            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+          >
+            <option value="">BRL</option>
+            <option value="">USD</option>
+          </select>
+        </div>
+        <input
+          type="number"
+          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
+          placeholder="0.00"
+        />
+      </div>
+    </div>
+    <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+    <div>
+      <h3 class="font-semibold">1 BRL = 0,18 USD</h3>
+    </div>
+  </main-content>
+</main>
