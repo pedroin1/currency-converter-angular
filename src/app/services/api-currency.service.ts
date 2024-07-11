@@ -8,13 +8,37 @@ import { Observable } from 'rxjs';
 export class ApiCurrencyService {
   constructor(private httpClient: HttpClient) {}
 
-  listarPaises(): Observable<ICode[]> {
-    return this.httpClient.get<ICode[]>(
+  public listarSiglasPaises(): Observable<IResponseExchageApi> {
+    return this.httpClient.get<IResponseExchageApi>(
       'https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/codes'
+    );
+  }
+
+  public realizarConversao(
+    primeiraSigla: string,
+    segundaSigla: string
+  ): Observable<IResponseExchage> {
+    return this.httpClient.get<IResponseExchage>(
+      `https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/pair/${primeiraSigla}/${segundaSigla}`
     );
   }
 }
 
-export interface ICode {
+export interface IResponseExchageApi {
+  result: string;
+  documentation: string;
+  terms_of_use: string;
   supported_codes: Array<string[]>;
+}
+export interface IResponseExchage {
+  result: string;
+  documentation: string;
+  terms_of_use: string;
+  time_last_update_unix: number;
+  time_last_update_utc: string;
+  time_next_update_unix: number;
+  time_next_update_utc: string;
+  base_code: string;
+  target_code: string;
+  conversion_rate: number;
 }
