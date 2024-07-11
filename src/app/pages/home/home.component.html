@@ -11,12 +11,14 @@
             class="rounded-[50%]"
           />
           <select
-            name=""
             id=""
-            (change)="setPrimeiraSigla($event)"
+            aria-placeholder="Selecione..."
+            name=""
             class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            (change)="realizarConversao()"
+            [(ngModel)]="primeiraSigla"
           >
-            <option selected disabled>Selecione...</option>
+            <option disabled>Selecione...</option>
             @for (item of siglas; track item.indexOf) {
             <option [value]="item">{{ item }}</option>
             }
@@ -24,10 +26,11 @@
         </div>
         <input
           type="number"
-          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
           placeholder="0.00"
           min="0"
+          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
           [(ngModel)]="inputPrimeiraSigla"
+          (change)="realizarConversao()"
         />
       </div>
     </div>
@@ -45,10 +48,12 @@
           <select
             name=""
             id=""
-            (change)="setSegundaSigla($event)"
+            [disabled]="primeiraSigla === '' && inputPrimeiraSigla === 0"
+            [(ngModel)]="segundaSigla"
+            (change)="realizarConversao()"
             class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
           >
-            <option selected disabled>Selecione...</option>
+            <option disabled sele>Selecione...</option>
             @for (item of siglas; track item.indexOf) {
             <option [value]="item">{{ item }}</option>
             }
@@ -56,7 +61,7 @@
         </div>
         <input
           type="number"
-          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
+          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end cursor-not-allowed"
           placeholder="0.00"
           min="0"
           disabled
@@ -64,15 +69,15 @@
         />
       </div>
     </div>
-    <button
-      class="mt-4 px-8 py-2 w-full bg-blue-500 rounded-2xl uppercase font-semibold text-white"
-      (click)="realizarConversao()"
-    >
-      converter
-    </button>
     <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+
+    @if (resultado > 0) {
     <div>
-      <h3 class="font-semibold">1 BRL = 0,18 USD</h3>
+      <h3 class="font-semibold">
+        1 {{ primeiraSigla }} = {{ cotacaoMinima }} {{ segundaSigla }}
+      </h3>
     </div>
+
+    }
   </main-content>
 </main>

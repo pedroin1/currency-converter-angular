@@ -18,27 +18,24 @@ import { ApiCurrencyService } from '../../services/api-currency.service';
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {
+  protected siglas: string[] = [];
+
   protected primeiraSigla: string = '';
   protected inputPrimeiraSigla: number = 0;
   protected segundaSigla: string = '';
   protected inputSegundaSigla: number = 0;
+
+  protected cotacaoMinima: number = 0;
   protected resultado: number = 0;
-  protected siglas: string[] = [];
 
   constructor(private apiCurrency: ApiCurrencyService) {}
-
-  protected setPrimeiraSigla(e: any) {
-    this.primeiraSigla = e.target.value;
-  }
-  protected setSegundaSigla(e: any) {
-    this.segundaSigla = e.target.value;
-  }
 
   protected realizarConversao() {
     if (this.primeiraSigla !== '' && this.segundaSigla !== '') {
       this.apiCurrency
         .realizarConversao(this.primeiraSigla, this.segundaSigla)
         .subscribe((data) => {
+          this.cotacaoMinima = data.conversion_rate;
           this.resultado = this.inputPrimeiraSigla * data.conversion_rate;
         });
     }
