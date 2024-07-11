@@ -23,10 +23,11 @@ export class HomeComponent implements OnInit {
   protected primeiraSigla: string = '';
   protected inputPrimeiraSigla: number = 0;
   protected segundaSigla: string = '';
-  protected inputSegundaSigla: number = 0;
 
   protected cotacaoMinima: number = 0;
   protected resultado: number = 0;
+
+  protected urlPrimeiraSigla: string = '';
 
   constructor(private apiCurrency: ApiCurrencyService) {}
 
@@ -39,6 +40,13 @@ export class HomeComponent implements OnInit {
           this.resultado = this.inputPrimeiraSigla * data.conversion_rate;
         });
     }
+  }
+
+  protected infoBandeira() {
+    let info = this.apiCurrency
+      .infoBandeira('BRL')
+      .subscribe((data) => data.flags);
+    console.log(info);
   }
 
   ngOnInit(): void {
