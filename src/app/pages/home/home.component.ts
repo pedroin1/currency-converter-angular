@@ -19,6 +19,7 @@ import { ApiCurrencyService } from '../../services/api-currency.service';
 })
 export class HomeComponent implements OnInit {
   protected siglas: string[] = [];
+  protected historico: IHistory[] = [];
 
   protected primeiraSigla: string = '';
   protected inputPrimeiraSigla: number = 0;
@@ -28,6 +29,8 @@ export class HomeComponent implements OnInit {
   protected resultado: number = 0;
 
   protected urlPrimeiraSigla: string = '';
+
+  protected showHistoric: boolean = false;
 
   constructor(private apiCurrency: ApiCurrencyService) {}
 
@@ -39,14 +42,14 @@ export class HomeComponent implements OnInit {
           this.cotacaoMinima = data.conversion_rate;
           this.resultado = this.inputPrimeiraSigla * data.conversion_rate;
         });
-    }
-  }
 
-  protected infoBandeira() {
-    let info = this.apiCurrency
-      .infoBandeira('BRL')
-      .subscribe((data) => data.flags);
-    console.log(info);
+      this.historico.push({
+        sigla1: this.primeiraSigla,
+        valor1: this.inputPrimeiraSigla,
+        sigla2: this.segundaSigla,
+        valor2: this.resultado,
+      });
+    }
   }
 
   ngOnInit(): void {
@@ -54,4 +57,11 @@ export class HomeComponent implements OnInit {
       this.siglas = data.supported_codes.map((item) => item[0]);
     });
   }
+}
+
+interface IHistory {
+  sigla1: string;
+  valor1: number;
+  sigla2: string;
+  valor2: number;
 }

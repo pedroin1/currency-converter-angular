@@ -1,12 +1,12 @@
-<main class="h-screen flex bg-yellow-100/50 items-center justify-center">
+<main class="h-screen flex bg-yellow-100/50 items-center justify-center gap-4">
   <main-content>
     <div>
-      <button (click)="infoBandeira()">test</button>
+      <button (click)="showHistoric = !showHistoric">mostrar historico</button>
       <p class="mb-2 font-semibold text-gray-500">Moeda</p>
       <div class="flex gap-4 items-center">
         <div class="flex gap-2">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/2000px-Flag_of_Brazil.svg.png"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
             alt=""
             width="50"
             class="rounded-[50%]"
@@ -37,11 +37,11 @@
     </div>
     <div class="h-[1px] my-8 w-full bg-gray-300"></div>
     <div>
-      <p class="mb-2 font-semibold text-gray-500">Converão</p>
+      <p class="mb-2 font-semibold text-gray-500">Conversão</p>
       <div class="flex gap-4 items-center">
         <div class="flex gap-2">
           <img
-            src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
             alt=""
             width="50"
             class="rounded-[50%]"
@@ -49,13 +49,13 @@
           <select
             name=""
             id=""
-            [disabled]="primeiraSigla === '' && inputPrimeiraSigla === 0"
+            [disabled]="primeiraSigla === '' || inputPrimeiraSigla === 0"
             [(ngModel)]="segundaSigla"
             (change)="realizarConversao()"
-            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 disabled:bg-slate-300 disabled:text-slate-300 delay-100 transition-all"
           >
             <option disabled sele>Selecione...</option>
-            @for (item of siglas; track item.indexOf) {
+            @for (item of siglas; track $index) {
             <option [value]="item">{{ item }}</option>
             }
           </select>
@@ -81,4 +81,21 @@
 
     }
   </main-content>
+  @if (showHistoric) {
+  <main-content class="animate-animeLeft">
+    <div class="w-[300px] h-[300px] overflow-y-auto">
+      <h3 class="text-center font-semibold text-slate-600 mb-4">
+        Historico de Conversões
+      </h3>
+      @for (item of historico; track $index) {
+      <div class="flex gap-2">
+        <p>{{ item.sigla1 }}</p>
+        <p>{{ item.valor1 }}</p>
+        <p>{{ item.sigla2 }}</p>
+        <p>{{ item.valor2 }}</p>
+      </div>
+      }
+    </div>
+  </main-content>
+  }
 </main>

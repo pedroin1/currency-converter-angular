@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 export class ApiCurrencyService {
   constructor(private httpClient: HttpClient) {}
 
-  public listarSiglasPaises(): Observable<IResponseExchageApi> {
-    return this.httpClient.get<IResponseExchageApi>(
+  public listarSiglasPaises(): Observable<ICountryCodesResponse> {
+    return this.httpClient.get<ICountryCodesResponse>(
       'https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/codes'
     );
   }
@@ -17,40 +17,34 @@ export class ApiCurrencyService {
   public realizarConversao(
     primeiraSigla: string,
     segundaSigla: string
-  ): Observable<IResponseExchage> {
-    return this.httpClient.get<IResponseExchage>(
+  ): Observable<IConversionRateResponse> {
+    return this.httpClient.get<IConversionRateResponse>(
       `https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/pair/${primeiraSigla}/${segundaSigla}`
     );
   }
 
-  public infoBandeira(siglaBandeira: string): Observable<IFlags> {
-    return this.httpClient.get<IFlags>(
+  public infoBandeira(siglaBandeira: string): Observable<IFlags[]> {
+    return this.httpClient.get<IFlags[]>(
       `https://restcountries.com/v3.1/currency/${siglaBandeira}`
     );
   }
 }
 
-export interface IResponseExchageApi {
+export interface ICountryCodesResponse {
   result: string;
-  documentation: string;
-  terms_of_use: string;
   supported_codes: Array<string[]>;
 }
-export interface IResponseExchage {
+export interface IConversionRateResponse {
   result: string;
-  documentation: string;
-  terms_of_use: string;
-  time_last_update_unix: number;
-  time_last_update_utc: string;
-  time_next_update_unix: number;
-  time_next_update_utc: string;
-  base_code: string;
-  target_code: string;
   conversion_rate: number;
 }
 
 export interface IFlags {
-  flags: Flags;
+  flags: FlagsType;
 }
 
-type Flags = 'png' | 'svg' | 'alt';
+interface FlagsType {
+  png: string;
+  svg: string;
+  alt: string;
+}
