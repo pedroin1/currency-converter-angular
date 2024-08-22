@@ -1,8 +1,14 @@
 <main class="h-screen flex bg-yellow-100/50 items-center justify-center gap-4">
   <main-content>
     <div>
-      <button (click)="showHistoric = !showHistoric">mostrar historico</button>
-      <p class="mb-2 font-semibold text-gray-500">Moeda</p>
+      <div class="flex justify-between items-center mb-2">
+        <p class="mb-2 font-semibold text-gray-500">Moeda</p>
+        @if(historico.length > 0){
+        <button (click)="showHistoric = !showHistoric">
+          <lucide-icon class="text-gray-500" name="file-clock"></lucide-icon>
+        </button>
+        }
+      </div>
       <div class="flex gap-4 items-center">
         <div class="flex gap-2">
           <img
@@ -13,13 +19,12 @@
           />
           <select
             id=""
-            aria-placeholder="Selecione..."
             name=""
             class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
             (change)="realizarConversao()"
             [(ngModel)]="primeiraSigla"
           >
-            <option disabled>Selecione...</option>
+            <option selected disabled>Selecione...</option>
             @for (item of siglas; track item.indexOf) {
             <option [value]="item">{{ item }}</option>
             }
@@ -81,18 +86,27 @@
 
     }
   </main-content>
-  @if (showHistoric) {
+  @if(showHistoric){
   <main-content class="animate-animeLeft">
     <div class="w-[300px] h-[300px] overflow-y-auto">
       <h3 class="text-center font-semibold text-slate-600 mb-4">
         Historico de Conversões
       </h3>
       @for (item of historico; track $index) {
-      <div class="flex gap-2">
-        <p>{{ item.sigla1 }}</p>
-        <p>{{ item.valor1 }}</p>
-        <p>{{ item.sigla2 }}</p>
-        <p>{{ item.valor2 }}</p>
+      <div class="flex gap-2 items-center mb-2">
+        <p class="whitespace-nowrap bg-slate-300 p-1 rounded-md text-xs">
+          {{ item.dataHora }}
+        </p>
+        <span class="text-sm whitespace-nowrap font-semibold"
+          >{{ item.valor1 }} {{ item.sigla1 }}'s</span
+        >
+        <lucide-icon
+          class="text-slate-400"
+          name="arrow-big-right-dash"
+        ></lucide-icon>
+        <span class="font-semibold whitespace-nowrap text-sm"
+          >{{ item.valor2 }} {{ item.sigla2 }}'s</span
+        >
       </div>
       }
     </div>

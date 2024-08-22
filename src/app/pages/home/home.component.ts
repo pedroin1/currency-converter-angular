@@ -9,11 +9,12 @@ import { ContentComponent } from '../../components/content/content.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiCurrencyService } from '../../services/api-currency.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ContentComponent, CommonModule, FormsModule],
+  imports: [ContentComponent, CommonModule, FormsModule, LucideAngularModule],
   providers: [ApiCurrencyService],
   templateUrl: './home.component.html',
 })
@@ -44,6 +45,9 @@ export class HomeComponent implements OnInit {
         });
 
       this.historico.push({
+        dataHora: new Date().toLocaleString('pt-BR', {
+          timeZone: 'America/Sao_Paulo',
+        }),
         sigla1: this.primeiraSigla,
         valor1: this.inputPrimeiraSigla,
         sigla2: this.segundaSigla,
@@ -60,6 +64,7 @@ export class HomeComponent implements OnInit {
 }
 
 interface IHistory {
+  dataHora: string;
   sigla1: string;
   valor1: number;
   sigla2: string;
