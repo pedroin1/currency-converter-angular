@@ -66,9 +66,6 @@ export class HomeComponent implements OnInit {
     secondInitial: string
   ) {
     this.historyService.saveHistory(
-      new Date().toLocaleString('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-      }),
       firstInitial,
       firstInitialValue,
       secondInitial,
