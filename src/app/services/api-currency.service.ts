@@ -1,50 +1,55 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { DestroyRef, Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, map, of, Subject } from 'rxjs';
+import { IConversionRateResponse } from '../entities/conversion-rate';
+import { ICountryCodesResponse } from '../entities/contry-codes';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class ApiCurrencyService {
-  constructor(private httpClient: HttpClient) {}
+  private _statesInitial$ = new BehaviorSubject<string[]>([]);
 
-  public listarSiglasPaises(): Observable<ICountryCodesResponse> {
-    return this.httpClient.get<ICountryCodesResponse>(
-      'https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/codes'
-    );
+  public readonly statesInitial$ = this._statesInitial$.asObservable();
+
+  private _conversionRate$ = new BehaviorSubject<number>(0);
+
+  public readonly conversionRate$ = this._conversionRate$.asObservable();
+
+  constructor(private httpClient: HttpClient, private destroyRef: DestroyRef) {
+    this.getStateInitials();
   }
 
-  public realizarConversao(
-    primeiraSigla: string,
-    segundaSigla: string
-  ): Observable<IConversionRateResponse> {
-    return this.httpClient.get<IConversionRateResponse>(
-      `https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/pair/${primeiraSigla}/${segundaSigla}`
-    );
+  private getStateInitials(): void {
+    this.httpClient
+      .get<ICountryCodesResponse>(
+        'https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/codes'
+      )
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((data) => data.supported_codes.map((item) => item[0])),
+        catchError((error) => {
+          console.log('Erro ao buscar as siglas dos paises.', error);
+          alert('Erro ao buscar as siglas dos paises.');
+          return of([]);
+        })
+      )
+      .subscribe(this._statesInitial$);
   }
 
-  public infoBandeira(siglaBandeira: string): Observable<IFlags[]> {
-    return this.httpClient.get<IFlags[]>(
-      `https://restcountries.com/v3.1/currency/${siglaBandeira}`
-    );
+  public convertCoin(firstInitial: string, secondInitial: string): void {
+    this.httpClient
+      .get<IConversionRateResponse>(
+        `https://v6.exchangerate-api.com/v6/56574e96dd31305f65bbb010/pair/${firstInitial}/${secondInitial}`
+      )
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((data: IConversionRateResponse) => data.conversion_rate),
+        catchError((error) => {
+          console.log('Erro ao converter moeda:', error);
+          alert('Erro ao converter moeda:');
+          return of(0);
+        })
+      )
+      .subscribe((result) => this._conversionRate$.next(result));
   }
-}
-
-export interface ICountryCodesResponse {
-  result: string;
-  supported_codes: Array<string[]>;
-}
-export interface IConversionRateResponse {
-  result: string;
-  conversion_rate: number;
-}
-
-export interface IFlags {
-  flags: FlagsType;
-}
-
-interface FlagsType {
-  png: string;
-  svg: string;
-  alt: string;
 }

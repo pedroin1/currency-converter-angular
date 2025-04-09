@@ -1,72 +1,89 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ContentComponent } from '../../components/content/content.component';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiCurrencyService } from '../../services/api-currency.service';
 import { LucideAngularModule } from 'lucide-angular';
+import { HistoryService } from '../../services/history.service';
+import { combineLatest } from 'rxjs';
+import { createCoinConverterFrom } from '../../form/coin-converter-form';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ContentComponent, CommonModule, FormsModule, LucideAngularModule],
+  imports: [
+    ContentComponent,
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    ReactiveFormsModule,
+    AsyncPipe,
+  ],
   providers: [ApiCurrencyService],
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {
-  protected siglas: string[] = [];
-  protected historico: IHistory[] = [];
+  protected conversionRate = signal<number>(0);
+  protected showHistory = signal<boolean>(false);
+  protected coinConverterForm = createCoinConverterFrom();
 
-  protected primeiraSigla: string = '';
-  protected inputPrimeiraSigla: number = 0;
-  protected segundaSigla: string = '';
+  constructor(
+    protected apiCurrencyService: ApiCurrencyService,
+    protected historyService: HistoryService,
+    private destroyRef: DestroyRef
+  ) {}
 
-  protected cotacaoMinima: number = 0;
-  protected resultado: number = 0;
+  protected handleShowHistory() {
+    this.showHistory.update((value) => (value = !value));
+  }
 
-  protected urlPrimeiraSigla: string = '';
+  protected handleCotationResult() {
+    return (
+      this.coinConverterForm.controls.firstInitialValue.value! *
+      this.conversionRate()
+    );
+  }
 
-  protected showHistoric: boolean = false;
+  private handleConvertCoin() {
+    const combinedInputsValue$ = combineLatest([
+      this.coinConverterForm.controls.firstInitial.valueChanges,
+      this.coinConverterForm.controls.firstInitialValue.valueChanges,
+      this.coinConverterForm.controls.secondInitial.valueChanges,
+    ]);
 
-  constructor(private apiCurrency: ApiCurrencyService) {}
-
-  protected realizarConversao() {
-    if (this.primeiraSigla !== '' && this.segundaSigla !== '') {
-      this.apiCurrency
-        .realizarConversao(this.primeiraSigla, this.segundaSigla)
-        .subscribe((data) => {
-          this.cotacaoMinima = data.conversion_rate;
-          this.resultado = this.inputPrimeiraSigla * data.conversion_rate;
-        });
-
-      this.historico.push({
-        dataHora: new Date().toLocaleString('pt-BR', {
-          timeZone: 'America/Sao_Paulo',
-        }),
-        sigla1: this.primeiraSigla,
-        valor1: this.inputPrimeiraSigla,
-        sigla2: this.segundaSigla,
-        valor2: this.resultado,
+    combinedInputsValue$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([firstInital, firstInitialValue, secondInitial]) => {
+        this.apiCurrencyService.convertCoin(firstInital!, secondInitial!);
+        this.onSaveHistory(firstInital!, firstInitialValue!, secondInitial!);
       });
-    }
+  }
+
+  private onSaveHistory(
+    firstInitial: string,
+    firstInitialValue: number,
+    secondInitial: string
+  ) {
+    this.historyService.saveHistory(
+      new Date().toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+      }),
+      firstInitial,
+      firstInitialValue,
+      secondInitial,
+      this.coinConverterForm.controls.secondInitialValue.value!
+    );
+  }
+
+  private getConversionRate() {
+    this.apiCurrencyService.conversionRate$.subscribe((result: number) => {
+      this.conversionRate.set(result);
+    });
   }
 
   ngOnInit(): void {
-    this.apiCurrency.listarSiglasPaises().subscribe((data) => {
-      this.siglas = data.supported_codes.map((item) => item[0]);
-    });
+    this.handleConvertCoin();
+    this.getConversionRate();
   }
-}
-
-interface IHistory {
-  dataHora: string;
-  sigla1: string;
-  valor1: number;
-  sigla2: string;
-  valor2: number;
 }

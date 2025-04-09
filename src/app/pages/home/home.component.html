@@ -1,98 +1,101 @@
 <main class="h-screen flex bg-yellow-100/50 items-center justify-center gap-4">
   <main-content>
-    <div>
-      <div class="flex justify-between items-center mb-2">
-        <p class="mb-2 font-semibold text-gray-500">Moeda</p>
-        @if(historico.length > 0){
-        <button (click)="showHistoric = !showHistoric">
-          <lucide-icon class="text-gray-500" name="file-clock"></lucide-icon>
-        </button>
-        }
-      </div>
-      <div class="flex gap-4 items-center">
-        <div class="flex gap-2">
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
-            alt=""
-            width="50"
-            class="rounded-[50%]"
-          />
-          <select
-            id=""
-            name=""
-            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-            (change)="realizarConversao()"
-            [(ngModel)]="primeiraSigla"
-          >
-            <option selected disabled>Selecione...</option>
-            @for (item of siglas; track item.indexOf) {
-            <option [value]="item">{{ item }}</option>
-            }
-          </select>
+    <form [formGroup]="coinConverterForm">
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <p class="mb-2 font-semibold text-gray-500">Moeda</p>
+          @if(this.historyService.getHistory().length > 0){
+          <button (click)="handleShowHistory()">
+            <lucide-icon class="text-gray-500" name="file-clock"></lucide-icon>
+          </button>
+          }
         </div>
-        <input
-          type="number"
-          placeholder="0.00"
-          min="0"
-          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
-          [(ngModel)]="inputPrimeiraSigla"
-          (change)="realizarConversao()"
-        />
-      </div>
-    </div>
-    <div class="h-[1px] my-8 w-full bg-gray-300"></div>
-    <div>
-      <p class="mb-2 font-semibold text-gray-500">Conversão</p>
-      <div class="flex gap-4 items-center">
-        <div class="flex gap-2">
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
-            alt=""
-            width="50"
-            class="rounded-[50%]"
+        <div class="flex gap-4 items-center">
+          <div class="flex gap-2">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
+              alt=""
+              width="50"
+              class="rounded-[50%]"
+            />
+            <select
+              id="firstInitial"
+              name="firstInitial"
+              formControlName="firstInitial"
+              #firstInitial
+              class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            >
+              <option value="" disabled selected>Selecione...</option>
+              @for (initial of this.apiCurrencyService.statesInitial$ | async;
+              track $index) {
+              <option [value]="initial">{{ initial }}</option>
+              }
+            </select>
+          </div>
+          <input
+            type="number"
+            placeholder="0.00"
+            min="0"
+            class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end"
+            formControlName="firstInitialValue"
           />
-          <select
-            name=""
-            id=""
-            [disabled]="primeiraSigla === '' || inputPrimeiraSigla === 0"
-            [(ngModel)]="segundaSigla"
-            (change)="realizarConversao()"
-            class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 disabled:bg-slate-300 disabled:text-slate-300 delay-100 transition-all"
-          >
-            <option disabled sele>Selecione...</option>
-            @for (item of siglas; track $index) {
-            <option [value]="item">{{ item }}</option>
-            }
-          </select>
         </div>
-        <input
-          type="number"
-          class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end cursor-not-allowed"
-          placeholder="0.00"
-          min="0"
-          disabled
-          [value]="resultado"
-        />
       </div>
-    </div>
-    <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+      <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+      <div>
+        <p class="mb-2 font-semibold text-gray-500">Conversão</p>
+        <div class="flex gap-4 items-center">
+          <div class="flex gap-2">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBo2-W_1ldeCcpvu0o7Q1ohksCICDqze4t5A&s"
+              alt=""
+              width="50"
+              class="rounded-[50%]"
+            />
+            <select
+              name="secondInitial"
+              id="secondInitial"
+              formControlName="secondInitial"
+              #secondInital
+              class="bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 disabled:bg-slate-300 disabled:text-slate-300 delay-100 transition-all"
+            >
+              <option value="" disabled selected>Selecione...</option>
+              @for (initial of this.apiCurrencyService.statesInitial$ | async;
+              track $index) {
+              <option [value]="initial">{{ initial }}</option>
+              }
+            </select>
+          </div>
+          <input
+            type="number"
+            class="w-32 text-sm rounded-lg p-2.5 bg-gray-200 text-black font-semibold text-end cursor-not-allowed"
+            placeholder="0.00"
+            min="0"
+            disabled
+            [value]="handleCotationResult()"
+          />
+        </div>
+      </div>
+      <div class="h-[1px] my-8 w-full bg-gray-300"></div>
+    </form>
 
-    @if (resultado > 0) {
+    @if (conversionRate() > 0) {
     <div>
       <h3 class="font-semibold">
-        1 {{ primeiraSigla }} = {{ cotacaoMinima }} {{ segundaSigla }}
+        1 {{ firstInitial.value! }} = {{ conversionRate() }}
+        {{ secondInital.value! }}
       </h3>
     </div>
 
     }
   </main-content>
-  @if(showHistoric){
+  @if(showHistory()){
   <main-content class="animate-animeLeft">
     <div class="w-[300px] h-[300px] overflow-y-auto">
       <h3 class="text-center font-semibold text-slate-600 mb-4">
         Historico de Conversões
       </h3>
-      @for (item of historico; track $index) {
+      @for (item of this.historyService.getHistory(); track $index) {
       <div class="flex gap-2 items-center mb-2">
         <p class="whitespace-nowrap bg-slate-300 p-1 rounded-md text-xs">
           {{ item.dataHora }}
